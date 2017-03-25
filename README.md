@@ -11,8 +11,10 @@ Please make sure to log them at https://github.com/gocd/docker-gocd-agent.
 Start the container with this:
 
 ```
-docker run -d -e GO_SERVER_URL=... gocd/gocd-agent-ubuntu-16.04
+docker run -d -e GO_SERVER_URL=... gocd/gocd-agent-ubuntu-16.04:v17.3.0
 ```
+
+**Note:** Please make sure to *always* provide the version. We do not publish the `latest` tag. And we don't intend to.
 
 This will start the GoCD agent and connect it the GoCD server specified by `GO_SERVER_URL`.
 
@@ -28,7 +30,7 @@ docker run -d \
         -e AGENT_AUTO_REGISTER_RESOURCES=... \
         -e AGENT_AUTO_REGISTER_ENVIRONMENTS=... \
         -e AGENT_AUTO_REGISTER_HOSTNAME=... \
-        gocd/gocd-agent-ubuntu-16.04
+        gocd/gocd-agent-ubuntu-16.04:v17.3.0
 ```
 
 If the `AGENT_AUTO_REGISTER_*` variables are provided (we recommend that you do), then the agent will be automatically approved by the server. See the [auto registration docs](https://docs.gocd.io/current/advanced_usage/agent_auto_register.html) on the GoCD website.
@@ -42,7 +44,7 @@ This image will work well with the [docker elastic agent plugin](https://github.
 The GoCD agent will store all configuration, logs and perform builds in `/godata`. If you'd like to provide secure credentials like SSH private keys among other things, you can mount `/home/go`
 
 ```
-docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-agent-ubuntu-16.04
+docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-agent-ubuntu-16.04:v17.3.0
 ```
 
 ## Tweaking JVM options (memory, heap etc)
@@ -50,7 +52,7 @@ docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-ag
 JVM options can be tweaked using the environment variable `GO_AGENT_SYSTEM_PROPERTIES`.
 
 ```
-docker run -e GO_AGENT_SYSTEM_PROPERTIES="-Dfoo=bar" gocd/gocd-agent-ubuntu-16.04
+docker run -e GO_AGENT_SYSTEM_PROPERTIES="-Dfoo=bar" gocd/gocd-agent-ubuntu-16.04:v17.3.0
 ```
 
 # Under the hood
