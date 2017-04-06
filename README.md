@@ -6,6 +6,10 @@
 
 Please make sure to log them at https://github.com/gocd/docker-gocd-agent.
 
+# Changelog
+
+Please checkout the changes made every release to the agent images at https://https://github.com/gocd/docker-gocd-agent/blob/master/CHANGELOG.md
+
 # Usage
 
 Start the container with this:
@@ -49,11 +53,13 @@ This image will work well with the [docker elastic agent plugin](https://github.
 
 ## Mounting volumes
 
-The GoCD agent will store all configuration, logs and perform builds in `/godata`. If you'd like to provide secure credentials like SSH private keys among other things, you can mount `/home/go`
+The GoCD agent will store all configuration, logs and perform builds in `/godata`. If you'd like to provide secure credentials like SSH private keys among other things, you can mount `/home/go`.
 
 ```
 docker run -v /path/to/godata:/godata -v /path/to/home-dir:/home/go gocd/gocd-agent-ubuntu-16.04:v17.3.0
 ```
+
+> **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` is accessible by the `go` user in container (`go` user - uid 1000).
 
 ## Tweaking JVM options (memory, heap etc)
 
@@ -81,6 +87,12 @@ The GoCD server runs as the `go` user, the location of the various directories i
 - Check if the docker container is running `docker ps -a`
 - Check the STDOUT to see if there is any output that indicates failures `docker logs CONTAINER_ID`
 - Check the agent logs `docker exec -it CONTAINER_ID /bin/bash`, then run `less /godata/logs/*.log` inside the container.
+
+# Bugs with Docker Agent Images 17.3.0
+
+* Anyone using our docker agent image as the base image for your customized image, and writing to `/home/go` as part of your Dockerfile, these changes in `/home/go` don't persist while you start the container with your custom image.
+ A fix has been applied [here](https://github.com/gocd/docker-gocd-agent/commit/27b8772) and will be available for subsequent releases of the docker images.
+
 
 # License
 
