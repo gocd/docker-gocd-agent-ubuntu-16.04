@@ -20,13 +20,13 @@
 FROM ubuntu:16.04
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="17.5.0" \
+LABEL gocd.version="17.6.0" \
   description="GoCD agent based on ubuntu version 16.04" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="17.5.0-5095" \
-  gocd.git.sha="3130b5ba96f8155ae86fefb261a559d4c7493326"
+  gocd.full.version="17.6.0-5142" \
+  gocd.git.sha="be1ff52e07d80323fcc615864a64f3afe83b7016"
 
-ADD "https://download.gocd.org/experimental/binaries/17.5.0-5095/generic/go-agent-17.5.0-5095.zip" /tmp/go-agent.zip
+ADD "https://download.gocd.org/binaries/17.6.0-5142/generic/go-agent-17.6.0-5142.zip" /tmp/go-agent.zip
 ADD https://github.com/krallin/tini/releases/download/v0.14.0/tini-static-amd64 /usr/local/sbin/tini
 ADD https://github.com/tianon/gosu/releases/download/1.10/gosu-amd64 /usr/local/sbin/gosu
 
@@ -53,7 +53,7 @@ RUN \
   apt-get autoclean && \
 # unzip the zip file into /go-agent, after stripping the first path prefix
   unzip /tmp/go-agent.zip -d / && \
-  mv go-agent-17.5.0 /go-agent && \
+  mv go-agent-17.6.0 /go-agent && \
   rm /tmp/go-agent.zip
 
 ADD docker-entrypoint.sh /
