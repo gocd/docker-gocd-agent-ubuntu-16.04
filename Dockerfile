@@ -20,13 +20,13 @@
 FROM ubuntu:16.04
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="17.8.0" \
+LABEL gocd.version="17.9.0" \
   description="GoCD agent based on ubuntu version 16.04" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="17.8.0-5277" \
-  gocd.git.sha="32ff863cce99f97b76abb1b88469a793e3b1adc5"
+  gocd.full.version="17.9.0-5368" \
+  gocd.git.sha="fd43db656e9d9b32d7ab9be1785208f346e9b1be"
 
-ADD https://github.com/krallin/tini/releases/download/v0.15.0/tini-static-amd64 /usr/local/sbin/tini
+ADD https://github.com/krallin/tini/releases/download/v0.16.1/tini-static-amd64 /usr/local/sbin/tini
 ADD https://github.com/tianon/gosu/releases/download/1.10/gosu-amd64 /usr/local/sbin/gosu
 
 # allow mounting ssh keys, dotfiles, and the go server config and data
@@ -51,11 +51,37 @@ RUN \
   apt-get install -y openjdk-8-jre-headless git subversion mercurial openssh-client bash unzip curl && \
   apt-get autoclean && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.8.0-5277/generic/go-agent-17.8.0-5277.zip" > /tmp/go-agent.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.9.0-5368/generic/go-agent-17.9.0-5368.zip" > /tmp/go-agent.zip && \
 # unzip the zip file into /go-agent, after stripping the first path prefix
   unzip /tmp/go-agent.zip -d / && \
-  mv go-agent-17.8.0 /go-agent && \
-  rm /tmp/go-agent.zip
+  mv go-agent-17.9.0 /go-agent && \
+  rm /tmp/go-agent.zip && \
+  # ensure that logs are printed to console output
+  sed -i -e 's/\(log4j.rootLogger.*\)/\1, stdout/g' /go-agent/config/agent-bootstrapper-log4j.properties && \
+  sed -i -e 's/\(log4j.rootCategory.*\)/\1, stdout/g' /go-agent/config/agent-bootstrapper-log4j.properties && \
+  echo "" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
+  echo "" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
+  echo "# Log to stdout" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
+  echo "log4j.appender.stdout=org.apache.log4j.ConsoleAppender" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
+  echo "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
+  echo "log4j.appender.stdout.layout.conversionPattern=%d{ISO8601} %5p [%t] %c{1}:%L - %m%n" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
+  sed -i -e 's/\(log4j.rootLogger.*\)/\1, stdout/g' /go-agent/config/agent-launcher-log4j.properties && \
+  sed -i -e 's/\(log4j.rootCategory.*\)/\1, stdout/g' /go-agent/config/agent-launcher-log4j.properties && \
+  echo "" >> /go-agent/config/agent-launcher-log4j.properties && \
+  echo "" >> /go-agent/config/agent-launcher-log4j.properties && \
+  echo "# Log to stdout" >> /go-agent/config/agent-launcher-log4j.properties && \
+  echo "log4j.appender.stdout=org.apache.log4j.ConsoleAppender" >> /go-agent/config/agent-launcher-log4j.properties && \
+  echo "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout" >> /go-agent/config/agent-launcher-log4j.properties && \
+  echo "log4j.appender.stdout.layout.conversionPattern=%d{ISO8601} %5p [%t] %c{1}:%L - %m%n" >> /go-agent/config/agent-launcher-log4j.properties && \
+  sed -i -e 's/\(log4j.rootLogger.*\)/\1, stdout/g' /go-agent/config/agent-log4j.properties && \
+  sed -i -e 's/\(log4j.rootCategory.*\)/\1, stdout/g' /go-agent/config/agent-log4j.properties && \
+  echo "" >> /go-agent/config/agent-log4j.properties && \
+  echo "" >> /go-agent/config/agent-log4j.properties && \
+  echo "# Log to stdout" >> /go-agent/config/agent-log4j.properties && \
+  echo "log4j.appender.stdout=org.apache.log4j.ConsoleAppender" >> /go-agent/config/agent-log4j.properties && \
+  echo "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout" >> /go-agent/config/agent-log4j.properties && \
+  echo "log4j.appender.stdout.layout.conversionPattern=%d{ISO8601} %5p [%t] %c{1}:%L - %m%n" >> /go-agent/config/agent-log4j.properties && \
+  true
 
 ADD docker-entrypoint.sh /
 
