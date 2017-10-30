@@ -20,11 +20,11 @@
 FROM ubuntu:16.04
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="17.10.0" \
+LABEL gocd.version="17.11.0" \
   description="GoCD agent based on ubuntu version 16.04" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="17.10.0-5380" \
-  gocd.git.sha="05598d88fd4dabdde1184faa4fbffc5f9406d0dc"
+  gocd.full.version="17.11.0-5520" \
+  gocd.git.sha="9f6909e2f64b07d2dce5cecd4ea5b92b8e19d6b1"
 
 ADD https://github.com/krallin/tini/releases/download/v0.16.1/tini-static-amd64 /usr/local/sbin/tini
 ADD https://github.com/tianon/gosu/releases/download/1.10/gosu-amd64 /usr/local/sbin/gosu
@@ -52,37 +52,16 @@ RUN \
   apt-get install -y openjdk-8-jre-headless git subversion mercurial openssh-client bash unzip curl && \
   apt-get autoclean && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.10.0-5380/generic/go-agent-17.10.0-5380.zip" > /tmp/go-agent.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/17.11.0-5520/generic/go-agent-17.11.0-5520.zip" > /tmp/go-agent.zip && \
 # unzip the zip file into /go-agent, after stripping the first path prefix
   unzip /tmp/go-agent.zip -d / && \
-  mv go-agent-17.10.0 /go-agent && \
-  rm /tmp/go-agent.zip && \
-  # ensure that logs are printed to console output
-  sed -i -e 's/\(log4j.rootLogger.*\)/\1, stdout/g' /go-agent/config/agent-bootstrapper-log4j.properties && \
-  sed -i -e 's/\(log4j.rootCategory.*\)/\1, stdout/g' /go-agent/config/agent-bootstrapper-log4j.properties && \
-  echo "" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
-  echo "" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
-  echo "# Log to stdout" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
-  echo "log4j.appender.stdout=org.apache.log4j.ConsoleAppender" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
-  echo "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
-  echo "log4j.appender.stdout.layout.conversionPattern=%d{ISO8601} %5p [%t] %c{1}:%L - %m%n" >> /go-agent/config/agent-bootstrapper-log4j.properties && \
-  sed -i -e 's/\(log4j.rootLogger.*\)/\1, stdout/g' /go-agent/config/agent-launcher-log4j.properties && \
-  sed -i -e 's/\(log4j.rootCategory.*\)/\1, stdout/g' /go-agent/config/agent-launcher-log4j.properties && \
-  echo "" >> /go-agent/config/agent-launcher-log4j.properties && \
-  echo "" >> /go-agent/config/agent-launcher-log4j.properties && \
-  echo "# Log to stdout" >> /go-agent/config/agent-launcher-log4j.properties && \
-  echo "log4j.appender.stdout=org.apache.log4j.ConsoleAppender" >> /go-agent/config/agent-launcher-log4j.properties && \
-  echo "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout" >> /go-agent/config/agent-launcher-log4j.properties && \
-  echo "log4j.appender.stdout.layout.conversionPattern=%d{ISO8601} %5p [%t] %c{1}:%L - %m%n" >> /go-agent/config/agent-launcher-log4j.properties && \
-  sed -i -e 's/\(log4j.rootLogger.*\)/\1, stdout/g' /go-agent/config/agent-log4j.properties && \
-  sed -i -e 's/\(log4j.rootCategory.*\)/\1, stdout/g' /go-agent/config/agent-log4j.properties && \
-  echo "" >> /go-agent/config/agent-log4j.properties && \
-  echo "" >> /go-agent/config/agent-log4j.properties && \
-  echo "# Log to stdout" >> /go-agent/config/agent-log4j.properties && \
-  echo "log4j.appender.stdout=org.apache.log4j.ConsoleAppender" >> /go-agent/config/agent-log4j.properties && \
-  echo "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout" >> /go-agent/config/agent-log4j.properties && \
-  echo "log4j.appender.stdout.layout.conversionPattern=%d{ISO8601} %5p [%t] %c{1}:%L - %m%n" >> /go-agent/config/agent-log4j.properties && \
-  true
+  mv go-agent-17.11.0 /go-agent && \
+  rm /tmp/go-agent.zip
+
+# ensure that logs are printed to console output
+COPY agent-bootstrapper-logback-include.xml /go-agent/config/agent-bootstrapper-logback-include.xml
+COPY agent-launcher-logback-include.xml /go-agent/config/agent-launcher-logback-include.xml
+COPY agent-logback-include.xml /go-agent/config/agent-logback-include.xml
 
 ADD docker-entrypoint.sh /
 
