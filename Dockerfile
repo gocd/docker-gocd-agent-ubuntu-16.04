@@ -20,13 +20,13 @@
 FROM ubuntu:16.04
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="18.1.0" \
+LABEL gocd.version="18.2.0" \
   description="GoCD agent based on ubuntu version 16.04" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="18.1.0-5937" \
-  gocd.git.sha="8a847b96ee8d38173f80178ed1285f0e53a970e0"
+  gocd.full.version="18.2.0-6228" \
+  gocd.git.sha="fbb379a451871b29aa47aef907a78dc64379233f"
 
-ADD https://github.com/krallin/tini/releases/download/v0.16.1/tini-static-amd64 /usr/local/sbin/tini
+ADD https://github.com/krallin/tini/releases/download/v0.17.0/tini-static-amd64 /usr/local/sbin/tini
 ADD https://github.com/tianon/gosu/releases/download/1.10/gosu-amd64 /usr/local/sbin/gosu
 
 
@@ -52,10 +52,10 @@ RUN \
   apt-get install -y openjdk-8-jre-headless git subversion mercurial openssh-client bash unzip curl && \
   apt-get autoclean && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/18.1.0-5937/generic/go-agent-18.1.0-5937.zip" > /tmp/go-agent.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/18.2.0-6228/generic/go-agent-18.2.0-6228.zip" > /tmp/go-agent.zip && \
 # unzip the zip file into /go-agent, after stripping the first path prefix
   unzip /tmp/go-agent.zip -d / && \
-  mv go-agent-18.1.0 /go-agent && \
+  mv go-agent-18.2.0 /go-agent && \
   rm /tmp/go-agent.zip && \
   mkdir -p /docker-entrypoint.d
 
