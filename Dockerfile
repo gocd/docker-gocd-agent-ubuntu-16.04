@@ -17,7 +17,7 @@
 # Please file any issues or PRs at https://github.com/gocd/docker-gocd-agent
 ###############################################################################################
 
-FROM ubuntu:16.04
+FROM ubuntu:xenial
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
 LABEL gocd.version="18.9.0" \
@@ -49,10 +49,10 @@ RUN \
   echo deb 'http://ppa.launchpad.net/openjdk-r/ppa/ubuntu xenial main' > /etc/apt/sources.list.d/openjdk-ppa.list && \
   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DA1A4A13543B466853BAF164EB9B1D8886F44E2A && \
   apt-get update && \
-  apt-get install -y openjdk-8-jre-headless git subversion mercurial openssh-client bash unzip curl && \
+  apt-get install -y openjdk-10-jre-headless git subversion mercurial openssh-client bash unzip curl && \
   apt-get autoclean && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/experimental/binaries/18.9.0-7478/generic/go-agent-18.9.0-7478.zip" > /tmp/go-agent.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/18.9.0-7478/generic/go-agent-18.9.0-7478.zip" > /tmp/go-agent.zip && \
 # unzip the zip file into /go-agent, after stripping the first path prefix
   unzip /tmp/go-agent.zip -d / && \
   mv go-agent-18.9.0 /go-agent && \
