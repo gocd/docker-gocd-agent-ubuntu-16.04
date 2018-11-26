@@ -20,14 +20,14 @@
 FROM ubuntu:xenial
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-LABEL gocd.version="18.10.0" \
+LABEL gocd.version="18.11.0" \
   description="GoCD agent based on ubuntu version 16.04" \
   maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="18.10.0-7703" \
-  gocd.git.sha="42d1cbe661161b5400289ead86c0447c84af8c0a"
+  gocd.full.version="18.11.0-8024" \
+  gocd.git.sha="68ad518659756345f346b74f7aa1cfa9ffd8a501"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
-ADD https://github.com/tianon/gosu/releases/download/1.10/gosu-amd64 /usr/local/sbin/gosu
+ADD https://github.com/tianon/gosu/releases/download/1.11/gosu-amd64 /usr/local/sbin/gosu
 
 
 # force encoding
@@ -49,13 +49,13 @@ RUN \
   echo deb 'http://ppa.launchpad.net/openjdk-r/ppa/ubuntu xenial main' > /etc/apt/sources.list.d/openjdk-ppa.list && \
   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DA1A4A13543B466853BAF164EB9B1D8886F44E2A && \
   apt-get update && \
-  apt-get install -y openjdk-10-jre-headless git subversion mercurial openssh-client bash unzip curl && \
+  apt-get install -y openjdk-11-jre-headless git subversion mercurial openssh-client bash unzip curl && \
   apt-get autoclean && \
 # download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/18.10.0-7703/generic/go-agent-18.10.0-7703.zip" > /tmp/go-agent.zip && \
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/18.11.0-8024/generic/go-agent-18.11.0-8024.zip" > /tmp/go-agent.zip && \
 # unzip the zip file into /go-agent, after stripping the first path prefix
   unzip /tmp/go-agent.zip -d / && \
-  mv go-agent-18.10.0 /go-agent && \
+  mv go-agent-18.11.0 /go-agent && \
   rm /tmp/go-agent.zip && \
   mkdir -p /docker-entrypoint.d
 
