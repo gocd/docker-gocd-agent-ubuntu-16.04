@@ -17,24 +17,29 @@
 # Please file any issues or PRs at https://github.com/gocd/docker-gocd-agent
 ###############################################################################################
 
-FROM ubuntu:xenial
-MAINTAINER GoCD <go-cd-dev@googlegroups.com>
+FROM alpine:latest as gocd-agent-unzip
+COPY go-agent-19.3.0-8959.zip /tmp/go-agent-19.3.0-8959.zip
+RUN unzip /tmp/go-agent-19.3.0-8959.zip -d /
+RUN mv /go-agent-19.3.0 /go-agent
 
-LABEL gocd.version="19.2.0" \
+FROM ubuntu:xenial
+MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
+
+LABEL gocd.version="19.3.0" \
   description="GoCD agent based on ubuntu version 16.04" \
-  maintainer="GoCD <go-cd-dev@googlegroups.com>" \
-  gocd.full.version="19.2.0-8641" \
-  gocd.git.sha="db17f5840f9d1c6838add93af050b812bbdf5c68"
+  maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
+  url="https://www.gocd.org" \
+  gocd.full.version="19.3.0-8959" \
+  gocd.git.sha="2c0a76ae7403804f7e0274d2e1976485555767f7"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 ADD https://github.com/tianon/gosu/releases/download/1.11/gosu-amd64 /usr/local/sbin/gosu
 
-
 # force encoding
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
-ENV GO_JAVA_HOME="/go-agent/jre"
+ENV GO_JAVA_HOME="/gocd-jre"
 
 ARG UID=1000
 ARG GID=1000
@@ -47,24 +52,19 @@ RUN \
   chown root:root /usr/local/sbin/gosu && \
 # add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added
-  groupadd -g ${GID} go && \ 
+  groupadd -g ${GID} go && \
   useradd -u ${UID} -g go -d /home/go -m go && \
   apt-get update && \
-  apt-get install -y  git subversion mercurial openssh-client bash unzip curl locales && \
+  apt-get install -y git subversion mercurial openssh-client bash unzip curl locales && \
   apt-get autoclean && \
   echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && /usr/sbin/locale-gen && \
-  curl --fail --location --silent --show-error https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz > openjdk-bin.tar.gz && \
-  mkdir -p /go-agent/jre && \
-  tar -xf openjdk-bin.tar.gz -C /go-agent/jre --strip 1 --exclude "jdk*/lib/src.zip" --exclude "jdk*/include" --exclude "jdk*/jmods" && \
-  rm -rf openjdk-bin.* && \
-# download the zip file
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.2.0-8641/generic/go-agent-19.2.0-8641.zip" > /tmp/go-agent.zip && \
-# unzip the zip file into /go-agent, after stripping the first path prefix
-  unzip /tmp/go-agent.zip -d / && \
-  mv go-agent-19.2.0/** /go-agent/ && \
-  rm /tmp/go-agent.zip && \
+  curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk12-binaries/releases/download/jdk-12%2B33/OpenJDK12U-jre_x64_linux_hotspot_12_33.tar.gz' --output /tmp/jre.tar.gz && \
+  mkdir -p /gocd-jre && \
+  tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
+  rm -rf /tmp/jre.tar.gz && \
   mkdir -p /docker-entrypoint.d
 
+COPY --from=gocd-agent-unzip /go-agent /go-agent
 # ensure that logs are printed to console output
 COPY agent-bootstrapper-logback-include.xml agent-launcher-logback-include.xml agent-logback-include.xml /go-agent/config/
 

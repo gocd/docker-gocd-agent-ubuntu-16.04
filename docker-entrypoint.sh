@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2018 ThoughtWorks, Inc.
+# Copyright 2019 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,6 +53,10 @@ setup_autoregister_properties_file() {
 [ -z "${VOLUME_DIR}" ] && VOLUME_DIR="/godata"
 
 AGENT_WORK_DIR="/go"
+
+if [ -e /run-docker-daemon.sh ]; then
+  /run-docker-daemon.sh
+fi
 
 # no arguments are passed so assume user wants to run the gocd server
 # we prepend "/go-agent/agent.sh" to the argument list
