@@ -21,23 +21,22 @@ FROM alpine:latest as gocd-agent-unzip
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.5.0-9272/generic/go-agent-19.5.0-9272.zip" > /tmp/go-agent-19.5.0-9272.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.6.0-9515/generic/go-agent-19.6.0-9515.zip" > /tmp/go-agent-19.6.0-9515.zip
 
-RUN unzip /tmp/go-agent-19.5.0-9272.zip -d /
-RUN mv /go-agent-19.5.0 /go-agent
+RUN unzip /tmp/go-agent-19.6.0-9515.zip -d /
+RUN mv /go-agent-19.6.0 /go-agent
 
 FROM ubuntu:xenial
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="19.5.0" \
+LABEL gocd.version="19.6.0" \
   description="GoCD agent based on ubuntu version 16.04" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="19.5.0-9272" \
-  gocd.git.sha="496bf8b95e603c1f3980ae59042bc559eecbbbc0"
+  gocd.full.version="19.6.0-9515" \
+  gocd.git.sha="4b674c10941b6c27d7ec2a28dd946518d9211b7a"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
-ADD https://github.com/tianon/gosu/releases/download/1.11/gosu-amd64 /usr/local/sbin/gosu
 
 # force encoding
 ENV LANG en_US.UTF-8
@@ -52,26 +51,31 @@ RUN \
 # add mode and permissions for files we added above
   chmod 0755 /usr/local/sbin/tini && \
   chown root:root /usr/local/sbin/tini && \
-  chmod 0755 /usr/local/sbin/gosu && \
-  chown root:root /usr/local/sbin/gosu && \
 # add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added
-  groupadd -g ${GID} go && \
-  useradd -u ${UID} -g go -d /home/go -m go && \
+# add user to root group for gocd to work on openshift
+  useradd -u ${UID} -g root -d /home/go -m go && \
   apt-get update && \
-  apt-get install -y git subversion mercurial openssh-client bash unzip curl locales && \
+  apt-get install -y git subversion mercurial openssh-client bash unzip curl locales procps sysvinit-utils coreutils && \
   apt-get autoclean && \
   echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && /usr/sbin/locale-gen && \
   curl --fail --location --silent --show-error 'https://github.com/AdoptOpenJDK/openjdk12-binaries/releases/download/jdk-12.0.1%2B12/OpenJDK12U-jre_x64_linux_hotspot_12.0.1_12.tar.gz' --output /tmp/jre.tar.gz && \
   mkdir -p /gocd-jre && \
   tar -xf /tmp/jre.tar.gz -C /gocd-jre --strip 1 && \
   rm -rf /tmp/jre.tar.gz && \
-  mkdir -p /docker-entrypoint.d
-
-COPY --from=gocd-agent-unzip /go-agent /go-agent
-# ensure that logs are printed to console output
-COPY agent-bootstrapper-logback-include.xml agent-launcher-logback-include.xml agent-logback-include.xml /go-agent/config/
+  mkdir -p /go-agent /docker-entrypoint.d /go /godata
 
 ADD docker-entrypoint.sh /
 
+
+COPY --from=gocd-agent-unzip /go-agent /go-agent
+# ensure that logs are printed to console output
+COPY --chown=go:root agent-bootstrapper-logback-include.xml agent-launcher-logback-include.xml agent-logback-include.xml /go-agent/config/
+
+RUN chown -R go:root /go-agent /docker-entrypoint.d /go /godata /docker-entrypoint.sh \
+    && chmod -R g=u /go-agent /docker-entrypoint.d /go /godata /docker-entrypoint.sh
+
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
+
+USER go
