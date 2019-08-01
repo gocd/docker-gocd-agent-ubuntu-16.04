@@ -21,20 +21,20 @@ FROM alpine:latest as gocd-agent-unzip
 RUN \
   apk --no-cache upgrade && \
   apk add --no-cache curl && \
-  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.6.0-9515/generic/go-agent-19.6.0-9515.zip" > /tmp/go-agent-19.6.0-9515.zip
+  curl --fail --location --silent --show-error "https://download.gocd.org/binaries/19.7.0-9567/generic/go-agent-19.7.0-9567.zip" > /tmp/go-agent-19.7.0-9567.zip
 
-RUN unzip /tmp/go-agent-19.6.0-9515.zip -d /
-RUN mv /go-agent-19.6.0 /go-agent
+RUN unzip /tmp/go-agent-19.7.0-9567.zip -d /
+RUN mv /go-agent-19.7.0 /go-agent
 
 FROM ubuntu:xenial
 MAINTAINER ThoughtWorks, Inc. <support@thoughtworks.com>
 
-LABEL gocd.version="19.6.0" \
+LABEL gocd.version="19.7.0" \
   description="GoCD agent based on ubuntu version 16.04" \
   maintainer="ThoughtWorks, Inc. <support@thoughtworks.com>" \
   url="https://www.gocd.org" \
-  gocd.full.version="19.6.0-9515" \
-  gocd.git.sha="4b674c10941b6c27d7ec2a28dd946518d9211b7a"
+  gocd.full.version="19.7.0-9567" \
+  gocd.git.sha="727ea9db824eb6971170ac2a886ff1072ff5a235"
 
 ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-static-amd64 /usr/local/sbin/tini
 
